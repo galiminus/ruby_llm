@@ -64,7 +64,15 @@ module RubyLLM
       new_tool_calls.each_value do |tool_call|
         if tool_call.id
           tool_call_id = tool_call.id.empty? ? SecureRandom.uuid : tool_call.id
-          tool_call_arguments = tool_call.arguments.empty? ? +'' : tool_call.arguments
+          pp tool_call.arguments
+          tool_call_arguments = if tool_call.arguments.nil? || tool_call.arguments.empty?
+            +''
+          elsif tool_call.arguments.is_a?(String)
+            JSON.parse(tool_call.arguments)
+          else
+            tool_call.arguments
+          end
+
           @tool_calls[tool_call.id] = ToolCall.new(
             id: tool_call_id,
             name: tool_call.name,
